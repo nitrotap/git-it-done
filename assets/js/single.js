@@ -3,10 +3,42 @@ js script file for single-repo.html
  */
 
 let issueContainerEl = document.querySelector("#issues-container");
+let limitWarningEl = document.querySelector("#limit-warning");
+let repoNameEl = document.querySelector("#repo-name");
+
+
+const getRepoName = function () {
+    let queryString = document.location.search; // string, anything after ? including the question mark
+    let repoName = queryString.split("=")[1];
+    console.log(repoName);
+
+    if (repoName) {
+        repoNameEl.textContent = repoName;
+        getRepoIssues(repoName);
+    } else {
+        document.location.replace("./index.html");
+    }
 
 
 
-let displayIssues = function(issues) {
+}
+
+const displayWarning = function(repo) {
+    // add text to warning container
+    limitWarningEl.textContent = "To see more than 30 issues, visit ";
+
+    let linkEl = document.createElement("a");
+    linkEl.textContent = "See More Issues on GitHub.com";
+    linkEl.setAttribute("href", "https://github.com/" + repo + "/issues");
+    linkEl.setAttribute("target", "_blank");
+
+    // append to warning container
+    limitWarningEl.appendChild(linkEl);
+    
+};
+
+
+const displayIssues = function(issues) {
     if (issues.length === 0) {
         issueContainerEl.textContent = "This repo has no open issues!";
         return;
@@ -58,13 +90,22 @@ let getRepoIssues = function(repo) {
             response.json().then(function(data) {
                 console.log(data);
                 displayIssues(data);
+
+                // check if api has paginated issues
+                if (response.headers.get("Link")) {
+                    console.log("repo has more than 30 issues");
+                    displayWarning(repo);
+                }
+
             });
         }
         else {
-            alert("There was a problem with your request!");
+            // alert("There was a problem with your request!");
+            document.location.replace("./index.html");
         }
 
     });
 };
 
-getRepoIssues("nitrotap/git-it-done");
+// getRepoIssues("facebook/react");
+getRepoName("nitrotap/nitrotap");
