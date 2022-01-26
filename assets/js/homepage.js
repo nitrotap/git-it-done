@@ -1,5 +1,5 @@
 /*
-js script file for homepage.html
+ * js script file for homepage.html
  */
 
 let userFormEl = document.querySelector("#user-form");
@@ -7,7 +7,17 @@ let nameInputEl = document.querySelector("#username");
 let repoContainerEl = document.querySelector("#repos-container");
 let repoSearchTerm = document.querySelector("#repo-search-term");
 
+let getFeaturedRepos = function (language) {
+    let apiUrl = "https://api.github.com/search/repositories?q=" + language + "+is:featured&sort=help-wanted-issues";
+    fetch(apiUrl).then(function(response) {
+        if (response.ok) {
+            console.log(response);
+        } else {
+            alert('Error: GitHub User Not Found');
+        }
+    });
 
+}
 
 let getUserRepos = function(user) {
     // format the GitHub api url
@@ -63,7 +73,7 @@ let displayRepos = function(repos, searchTerm) {
 
         // create a container for each repo
         // create a container for each repo
-        var repoEl = document.createElement("a");
+        let repoEl = document.createElement("a");
         repoEl.classList = "list-item flex-row justify-space-between align-center";
         repoEl.setAttribute("href", "./single-repo.html?repo=" + repoName);
 
@@ -95,3 +105,22 @@ let displayRepos = function(repos, searchTerm) {
 
 
 };
+
+
+
+let buttonClickHandler = function (event) {
+    let language = event.target.getAttribute("data-language");
+    console.log(language);
+
+    if (language) {
+        getFeaturedRepos(language);
+
+        // clear old content
+        repoContainerEl.textContent = "";
+    }
+}
+
+let languageButtonsEl = document.querySelector("#language-buttons")
+languageButtonsEl.addEventListener("click", buttonClickHandler);
+
+
